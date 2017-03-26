@@ -15,6 +15,13 @@ def knn(vector, matrix, k=10):
 
     nearest_idx = []
 
+    distances = []
+
+    # Calculate Norm of Input Vector
+    vector_norm = np.sqrt(np.sum(vector**2))
+    matrix_norms = np.sqrt(np.sum(matrix**2, axis=1))
+
+
     ### YOUR CODE HERE
     raise NotImplementedError
     ### END YOUR CODE

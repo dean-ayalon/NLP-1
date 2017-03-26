@@ -14,9 +14,10 @@ def normalizeRows(x):
     unit length.
     """
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    #Calculate the l2-norm of each row
+    norms = np.sqrt(np.sum(x**2, axis=1))
+    #Divide each row's elements by its norm
+    x = np.divide(x, norms.reshape(-1, 1))
 
     return x
 

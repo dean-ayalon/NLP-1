@@ -13,18 +13,19 @@ def knn(vector, matrix, k=10):
     nearest_idx -- A numpy vector consists of the rows indices of the k-nearest neighbors in the matrix
     """
 
-    nearest_idx = []
-
-    distances = []
-
     # Calculate Norm of Input Vector
     vector_norm = np.sqrt(np.sum(vector**2))
     matrix_norms = np.sqrt(np.sum(matrix**2, axis=1))
 
+    nominators = np.dot(matrix, vector)
+    denominators = vector_norm * matrix_norms
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    # Multiplying all distacnes by -1 so we can use argpartition to find the k smallest
+    # elements
+    distances = np.divide(nominators, denominators) * (-1)
+
+    nearest_idx = np.argpartition(distances, k)[:k]
+
     return nearest_idx
 
 def test_knn():

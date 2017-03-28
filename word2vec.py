@@ -58,9 +58,26 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     assignment!
     """
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    y_hat_nom = np.exp(np.dot(outputVectors, predicted))
+    y_hat_denom = np.sum(y_hat_nom)
+    y_hat = np.divide(y_hat_nom, y_hat_denom)
+    print("y_hat is" + str(y_hat))
+
+    cost = -np.log(y_hat[target])
+
+    y = np.zeros(shape=outputVectors.shape[0])
+    y[target] = 1
+
+    print("y is" + str(y))
+    print("y_hat-y is" + str(y_hat-y))
+
+    gradPred = np.dot(outputVectors, y_hat-y)
+
+    # Assuming predicted's shape is (d,) and y_hat and y's shape is (V,)
+    # So we use the reshape function to turn them into column and row vectors so the dot product between them
+    # produces a matrix, as it should.
+
+    grad = np.dot(predicted.reshape((-1, 1)), (y_hat-y).reshape(1, -1))
 
     return cost, gradPred, grad
 
@@ -95,6 +112,9 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     # wish to match the autograder and receive points!
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
+
+    cost = -np.log(sigmoid(np.dot(outputVectors[target], predicted)))
+    cost -= np.sum([np.log(sigmoid(np.dot(-outputVectors[k], predicted))) for k in indices])
 
     ### YOUR CODE HERE
     raise NotImplementedError

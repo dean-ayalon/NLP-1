@@ -36,9 +36,22 @@ def test_knn():
     your tests be graded.
     """
     print "Running your tests..."
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    mat = np.array([[1,2,1], [0,1,0], [5,7,8], [2,4,5]])
+    vec = mat [1]  # [0,1,0]
+
+    t1 = knn(vec, mat, k=1)
+    print "test 1 result:", t1
+    assert set(t1) == {1}
+
+    t2 = knn(vec, mat, k=2)
+    print "test 2 result:", t2
+    assert set(t2) == {0, 1}
+
+    t3 = knn(vec, mat, k=3)
+    print "test 3 result:", t3
+    assert set(t3) == {0, 1, 3}
+
+    # t4 = knn(vec, mat, k=5) # TODO: do we want to test this scenario?
 
 if __name__ == "__main__":
     test_knn()

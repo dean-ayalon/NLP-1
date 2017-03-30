@@ -120,7 +120,7 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     gradPred += np.sum([(1-sigmoid(np.dot(-outputVectors[k], predicted))) * outputVectors[k] for k in indices])
 
     grad = np.zeros(shape=outputVectors.shape)
-    grad[target] = (sigmoid(outputVectors[target], predicted)-1)*predicted
+    grad[target] = (sigmoid(np.dot(outputVectors[target], predicted))-1)*predicted # todo: changed by mor
     for k in indices:
         grad[k] = (1-sigmoid(np.dot(-outputVectors[k], predicted)))*predicted
 
@@ -155,10 +155,13 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
 
-    for i in range(2*C):
+    # TODO: added by mor
+    predicted = inputVectors[tokens[currentWord]]
+
+    for i in range(len(contextWords)):  # todo: changed by mor from 2*c to len(contextWords)
         target = tokens[contextWords[i]]
         current_cost, current_gradIn, current_gradOut = \
-            word2vecCostAndGradient(currentWord, target, outputVectors, dataset)
+            word2vecCostAndGradient(predicted, target, outputVectors, dataset) # todo: added by mor
         cost, gradIn, gradOut = cost+current_cost, gradIn+current_gradIn, gradOut+current_gradOut
 
     return cost, gradIn, gradOut

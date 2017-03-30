@@ -8,6 +8,7 @@ import random
 import numpy as np
 import os.path as op
 import cPickle as pickle
+import math
 
 
 def load_saved_params():
@@ -83,9 +84,9 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
         # Don't forget to apply the postprocessing after every iteration!
         # You might want to print the progress every few iterations.
 
-        cost = None
-
-
+        cost, grad = f(x)
+        x -= step * grad
+        x = postprocessing(x) if postprocessing else x
 
         if iter % PRINT_EVERY == 0:
             if not expcost:
@@ -130,10 +131,29 @@ def your_sanity_checks():
     your additional tests be graded.
     """
     print "Running your sanity checks..."
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    f = lambda x: (np.sum((x-1) **2), 2 * (x - 1))  # min = 1
+    t1 = sgd(f, 0.0, 0.01, 1000, PRINT_EVERY=100)
+    print "our test 1 result:", t1
+    assert abs(t1-1) <= 1e-6
 
+    t2 = sgd(f, 10.0, 0.01, 1000, PRINT_EVERY=100)
+    print "our test 2 result:", t1
+    assert abs(t2 - 1) <= 1e-6
+
+    t3 = sgd(f, 1.0, 0.01, 1000, PRINT_EVERY=100)
+    print "our test 3 result:", t1
+    assert abs(t3 - 1) <= 1e-6
+
+    print ""
+
+    f1 = lambda x: (math.sin(x), math.cos(x))  # min = -pi/2
+    t4 = sgd(f1, 0.0, 0.02, 3000, PRINT_EVERY=100)
+    print "our test 4 result:", t4
+    assert abs(t4 + (math.pi / 2)) <= 1e-6
+
+    t5 = sgd(f1, math.pi, 0.02, 3000, PRINT_EVERY=100)  # min = 3pi /2
+    print "our test 5 result:", t5
+    assert abs(t5 + (-3 * math.pi / 2)) <= 1e-6
 
 if __name__ == "__main__":
     sanity_check()

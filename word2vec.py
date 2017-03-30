@@ -116,9 +116,13 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     cost = -np.log(sigmoid(np.dot(outputVectors[target], predicted)))
     cost -= np.sum([np.log(sigmoid(np.dot(-outputVectors[k], predicted))) for k in indices])
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    gradPred = -(1-sigmoid(np.dot(outputVectors[target], predicted))) * outputVectors[target]
+    gradPred += np.sum([(1-sigmoid(np.dot(-outputVectors[k], predicted))) * outputVectors[k] for k in indices])
+
+    grad = np.zeros(shape=outputVectors.shape)
+    grad[target] = (sigmoid(outputVectors[target], predicted)-1)*predicted
+    for k in indices:
+        grad[k] = (1-sigmoid(np.dot(-outputVectors[k], predicted)))*predicted
 
     return cost, gradPred, grad
 
@@ -151,9 +155,11 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
 
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
+    for i in range(2*C):
+        target = tokens[contextWords[i]]
+        current_cost, current_gradIn, current_gradOut = \
+            word2vecCostAndGradient(currentWord, target, outputVectors, dataset)
+        cost, gradIn, gradOut = cost+current_cost, gradIn+current_gradIn, gradOut+current_gradOut
 
     return cost, gradIn, gradOut
 
@@ -174,10 +180,6 @@ def cbow(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     cost = 0.0
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
-
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
 
     return cost, gradIn, gradOut
 

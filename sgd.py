@@ -84,9 +84,8 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
         # You might want to print the progress every few iterations.
 
         cost = None
-        ### YOUR CODE HERE
-        raise NotImplementedError
-        ### END YOUR CODE
+
+
 
         if iter % PRINT_EVERY == 0:
             if not expcost:

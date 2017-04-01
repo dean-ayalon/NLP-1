@@ -61,24 +61,19 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     y_hat_nom = np.exp(np.dot(outputVectors, predicted))
     y_hat_denom = np.sum(y_hat_nom)
     y_hat = np.divide(y_hat_nom, y_hat_denom)
-    # print("y_hat is" + str(y_hat))
 
     cost = -np.log(y_hat[target])
 
     y = np.zeros(shape=outputVectors.shape[0])
     y[target] = 1
 
-    # print("y is" + str(y))
-    # print("y_hat-y is" + str(y_hat-y))
-
-    # gradPred = np.dot(outputVectors, y_hat-y) # todo: changed by mor
+    # todo: changed by mor
     gradPred = np.dot(y_hat - y, outputVectors)
 
     # Assuming predicted's shape is (d,) and y_hat and y's shape is (V,)
     # So we use the reshape function to turn them into column and row vectors so the dot product between them
     # produces a matrix, as it should.
 
-    # grad = np.dot(predicted.reshape((-1, 1)), (y_hat-y).reshape(1, -1))
     grad = np.dot((y_hat-y).reshape(-1, 1), predicted.reshape((1, -1)))  # todo: changed by mor
 
     return cost, gradPred, grad
@@ -96,7 +91,7 @@ def getNegativeSamples(target, dataset, K):
     return indices
 
 
-def negSamplingCostAndGradient_orig(predicted, target, outputVectors, dataset,
+def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
                                K=10):
     """ Negative sampling cost function for word2vec models
 
@@ -115,12 +110,8 @@ def negSamplingCostAndGradient_orig(predicted, target, outputVectors, dataset,
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
 
-    indices = set(indices[1:]) #todo: added by mor
     cost = -np.log(sigmoid(np.dot(outputVectors[target], predicted)))
     cost -= np.sum([np.log(sigmoid(np.dot(-outputVectors[k], predicted))) for k in indices]) #todo: changed by mor
-
-    # gradPred = -(1-sigmoid(np.dot(outputVectors[target], predicted))) * outputVectors[target]
-    # gradPred += np.sum([(1-sigmoid(np.dot(-outputVectors[k], predicted))) * outputVectors[k] for k in indices])
 
     gradPred = (sigmoid(np.dot(outputVectors[target], predicted)) - 1) * outputVectors[target] #todo: changed by mor
     for k in indices:
@@ -129,34 +120,10 @@ def negSamplingCostAndGradient_orig(predicted, target, outputVectors, dataset,
     grad = np.zeros(shape=outputVectors.shape)
     grad[target] = (sigmoid(np.dot(outputVectors[target], predicted)) - 1)*predicted # todo: changed by mor
     for k in indices:
-        grad[k] = -1 * (sigmoid(np.dot(-1*outputVectors[k], predicted)) - 1)*predicted
+        grad[k] += -1 * (sigmoid(np.dot(-1*outputVectors[k], predicted)) - 1)*predicted
 
     return cost, gradPred, grad
 
-def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
-                                   K=10):
-    # Sampling of indices is done for you. Do not modify this if you
-    # wish to match the autograder and receive points!
-    indices = [target]
-    indices.extend(getNegativeSamples(target, dataset, K))
-
-    ### YOUR CODE HERE
-    sigmoidTargetPred = sigmoid(outputVectors[target, :].transpose().dot(predicted))
-    cost = -np.log(sigmoidTargetPred)
-    gradPred = (sigmoidTargetPred - 1.0) * outputVectors[target, :]
-    grad = np.zeros(outputVectors.shape)
-    grad[target, :] = predicted * (sigmoidTargetPred - 1.0)
-
-    for s in indices:
-        sigmoidSamplePredicted = sigmoid(-outputVectors[s, :].transpose().dot(predicted))
-        cost -= np.log(sigmoidSamplePredicted)
-        gradPred += (1.0 - sigmoidSamplePredicted) * outputVectors[s, :]
-
-
-        grad[s, :] += (1.0 - sigmoidSamplePredicted) * predicted.transpose()
-    ### END YOUR CODE
-
-    return cost, gradPred, grad
 
 def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
              dataset, word2vecCostAndGradient=softmaxCostAndGradient):
@@ -193,7 +160,8 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
         target = tokens[contextWords[i]]
         current_cost, current_gradIn, current_gradOut = \
             word2vecCostAndGradient(predicted, target, outputVectors, dataset) # todo: added by mor
-        cost, gradIn[tokens[currentWord]], gradOut = cost+current_cost, gradIn[tokens[currentWord]]+current_gradIn, gradOut+current_gradOut # todo: changed by mor
+        cost, gradIn[tokens[currentWord]], gradOut = \
+            cost+current_cost, gradIn[tokens[currentWord]]+current_gradIn, gradOut+current_gradOut # todo: changed by mor
 
     return cost, gradIn, gradOut
 

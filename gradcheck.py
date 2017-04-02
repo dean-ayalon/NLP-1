@@ -28,7 +28,6 @@ def gradcheck_naive(f, x):
         # before calling f(x) each time. This will make it possible
         # to test cost functions with built in randomness later.
 
-        # numgrad = (f(x[ix] + h)[0] - (f(x[ix] - h)[0])) / (2*h) #todo: changed by mor
         old_value = x[ix]
         x[ix] = old_value + h
         random.setstate(rndstate)
@@ -76,7 +75,6 @@ def your_sanity_checks():
     """
     print "Running your sanity checks..."
     ### YOUR CODE HERE
-    # todo: add tests
     # raise NotImplementedError
     ### END YOUR CODE
 

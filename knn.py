@@ -51,7 +51,6 @@ def test_knn():
     print "test 3 result:", t3
     assert set(t3) == {0, 1, 3}
 
-    # t4 = knn(vec, mat, k=5) # TODO: do we want to test this scenario?
 
 if __name__ == "__main__":
     test_knn()

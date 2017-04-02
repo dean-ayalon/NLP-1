@@ -67,14 +67,13 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     y = np.zeros(shape=outputVectors.shape[0])
     y[target] = 1
 
-    # todo: changed by mor
     gradPred = np.dot(y_hat - y, outputVectors)
 
     # Assuming predicted's shape is (d,) and y_hat and y's shape is (V,)
     # So we use the reshape function to turn them into column and row vectors so the dot product between them
     # produces a matrix, as it should.
 
-    grad = np.dot((y_hat-y).reshape(-1, 1), predicted.reshape((1, -1)))  # todo: changed by mor
+    grad = np.dot((y_hat-y).reshape(-1, 1), predicted.reshape((1, -1)))
 
     return cost, gradPred, grad
 
@@ -110,16 +109,19 @@ def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     indices = [target]
     indices.extend(getNegativeSamples(target, dataset, K))
 
-    cost = -np.log(sigmoid(np.dot(outputVectors[target], predicted)))
-    cost -= np.sum([np.log(sigmoid(np.dot(-outputVectors[k], predicted))) for k in indices]) #todo: changed by mor
+    # To match the theoretical gradients we calculated, we assume the negative samples never include the target word
+    neg_samples_indices = indices[1:]
 
-    gradPred = (sigmoid(np.dot(outputVectors[target], predicted)) - 1) * outputVectors[target] #todo: changed by mor
-    for k in indices:
+    cost = -np.log(sigmoid(np.dot(outputVectors[target], predicted)))
+    cost -= np.sum([np.log(sigmoid(np.dot(-outputVectors[k], predicted))) for k in neg_samples_indices])
+
+    gradPred = (sigmoid(np.dot(outputVectors[target], predicted)) - 1) * outputVectors[target]
+    for k in neg_samples_indices:
         gradPred -= (sigmoid(np.dot(-1*outputVectors[k], predicted)) - 1) * outputVectors[k]
 
     grad = np.zeros(shape=outputVectors.shape)
-    grad[target] = (sigmoid(np.dot(outputVectors[target], predicted)) - 1)*predicted # todo: changed by mor
-    for k in indices:
+    grad[target] = (sigmoid(np.dot(outputVectors[target], predicted)) - 1)*predicted
+    for k in neg_samples_indices:
         grad[k] += -1 * (sigmoid(np.dot(-1*outputVectors[k], predicted)) - 1)*predicted
 
     return cost, gradPred, grad
@@ -153,15 +155,14 @@ def skipgram(currentWord, C, contextWords, tokens, inputVectors, outputVectors,
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
 
-    # TODO: added by mor
     predicted = inputVectors[tokens[currentWord]]
 
-    for i in range(len(contextWords)):  # todo: changed by mor from 2*c to len(contextWords)
+    for i in range(len(contextWords)):
         target = tokens[contextWords[i]]
         current_cost, current_gradIn, current_gradOut = \
-            word2vecCostAndGradient(predicted, target, outputVectors, dataset) # todo: added by mor
+            word2vecCostAndGradient(predicted, target, outputVectors, dataset)
         cost, gradIn[tokens[currentWord]], gradOut = \
-            cost+current_cost, gradIn[tokens[currentWord]]+current_gradIn, gradOut+current_gradOut # todo: changed by mor
+            cost+current_cost, gradIn[tokens[currentWord]]+current_gradIn, gradOut+current_gradOut
 
     return cost, gradIn, gradOut
 

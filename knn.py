@@ -20,7 +20,7 @@ def knn(vector, matrix, k=10):
     nominators = np.dot(matrix, vector)
     denominators = vector_norm * matrix_norms
 
-    # Multiplying all distacnes by -1 so we can use argpartition to find the k smallest
+    # Multiplying all distances by -1 so we can use argpartition to find the k smallest
     # elements
     distances = np.divide(nominators, denominators) * (-1)
 
